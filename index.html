@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Postal Code Lookup</title>
+  <title>Postal Code Lookup 3:08PM</title>
 
   <!-- Load PapaParse library for CSV parsing -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
@@ -135,6 +135,23 @@
       }
     }
 
+    // Search by postal code (if required)
+    function searchByPostalCode() {
+      const postalCode = document.getElementById('postal_code_input').value;
+      console.log("Searching for postal code:", postalCode);
+
+      // Find matching entry in the CSV data
+      const entry = postalData.find(row => row.postal_code == postalCode);
+      if (entry) {
+        document.getElementById("address_result").innerHTML = `
+          <p>English Address: ${entry.english_address}</p>
+          <p>Japanese Address: ${entry.japanese_address}</p>
+        `;
+      } else {
+        document.getElementById("address_result").innerHTML = "<p>No data found for this postal code.</p>";
+      }
+    }
+
     // Call loadCSVData when the page loads
     window.onload = loadCSVData;
   </script>
@@ -144,7 +161,7 @@
   <!-- Postal code input form -->
   <div>
     <input type="text" id="postal_code_input" placeholder="Enter postal code">
-    <button onclick="searchByPostalCode()">Search</button>
+    <button onclick="searchByPostalCode()">Search by Postal Code</button>
   </div>
 
   <!-- Manual search form -->
