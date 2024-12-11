@@ -1,48 +1,15 @@
-<body>
-  <div class="container mt-1">
-    <h2 class="text-center mb-4">Postal Code Lookup 3:38 PM</h2>
-    
-    <!-- Postal code input group with search button on the right -->
-    <div class="mb-4">
-      <div class="input-group">
-        <input type="text" id="postal_code_input" class="form-control" placeholder="Enter postal code">
-        <button class="btn btn-primary" onclick="searchByPostalCode()">Search by Postal Code</button>
-      </div>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Postal Code Lookup</title>
 
-    <!-- Prefecture and City selectors in one row -->
-    <div class="mb-4">
-        <select id="prefecture_select" class="form-select" onchange="loadCities()">
-          <option value="">Select Prefecture</option>
-        </select>
-	</div>
-	<div class="mb-4">
-        <select id="city_select" class="form-select" onchange="loadTowns()">
-          <option value="">Select City</option>
-        </select>
-    </div>
+  <!-- Load Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Town and Search by Location in another row -->
-    <div class="mb-4">
-        <select id="town_select" class="form-select">
-          <option value="">Select Town</option>
-        </select>
-    </div>
-    <div class="mb-4">
-        <button class="btn btn-success w-100" onclick="searchByLocation()">Search by Location</button>
-      </div>
-
-    <!-- Result display -->
-    <div id="address_result" class="mt-4"></div>
-
-    <!-- Copy Address Button -->
-    <div id="copy_address_btn" class="text-center mt-4" style="display: none;">
-      <button class="btn btn-info" onclick="copyAddress()">Copy Both</button>
-    </div>
-  </div>
-
-  <!-- Load Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Load PapaParse library for CSV parsing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
   <script>
     // CSV URL (Replace with the URL you got from Google Sheets)
@@ -159,10 +126,8 @@
         const japaneseAddress = `${entry.postal_code} ${entry.prefecture_kanji} ${entry.city_kanji} ${entry.town_kanji}`;
         
         document.getElementById("address_result").innerHTML = `
-          <p><strong>English Address:</strong> ${englishAddress}</p>
-          <p><strong>Japanese Address:</strong> ${japaneseAddress}</p>
-          <p><strong>Shipping Fee:</strong> ${entry.shipping_fee}</p>
-          <p><strong>Lead Time:</strong> ${entry.lead_time}</p>
+          <p><strong>English Address<br></strong> ${englishAddress}</p>
+          <p><strong>Japanese Address<br></strong> ${japaneseAddress}</p>
           <button class="btn btn-info" onclick="copyBoth()">Copy Both</button>
         `;
       } else {
@@ -195,8 +160,6 @@
         document.getElementById("address_result").innerHTML = `
           <p><strong>English Address:</strong> ${englishAddress}</p>
           <p><strong>Japanese Address:</strong> ${japaneseAddress}</p>
-          <p><strong>Shipping Fee:</strong> ${entry.shipping_fee}</p>
-          <p><strong>Lead Time:</strong> ${entry.lead_time}</p>
           <button class="btn btn-info" onclick="copyBoth()">Copy Both</button>
         `;
       } else {
@@ -217,11 +180,61 @@
       tempTextArea.select();
       document.execCommand('copy');
       document.body.removeChild(tempTextArea);
-      
+
       alert('Addresses copied to clipboard!');
     }
 
-    // Initialize the app by loading the CSV data
-    loadCSVData();
+    // Call loadCSVData when the page loads
+    window.onload = loadCSVData;
   </script>
+</head>
+<body>
+  <div class="container mt-1">
+    <h2 class="text-center mb-4">Postal Code Lookup 3:28 PM</h2>
+    
+    <!-- Postal code input group with search button on the right -->
+    <div class="mb-4">
+      <div class="input-group">
+        <input type="text" id="postal_code_input" class="form-control" placeholder="Enter postal code">
+        <button class="btn btn-primary" onclick="searchByPostalCode()">Search by Postal Code</button>
+      </div>
+    </div>
+
+    <!-- Prefecture and City selectors in one row -->
+    <div class="mb-4">
+        <select id="prefecture_select" class="form-select" onchange="loadCities()">
+          <option value="">Select Prefecture</option>
+        </select>
+	</div>
+	<div class="mb-4">
+        <select id="city_select" class="form-select" onchange="loadTowns()">
+          <option value="">Select City</option>
+        </select>
+    </div>
+
+    <!-- Town and Search by Location in another row -->
+    <div class="mb-4">
+        <select id="town_select" class="form-select">
+          <option value="">Select Town</option>
+        </select>
+    </div>
+    <div class="mb-4">
+        <button class="btn btn-success w-100" onclick="searchByLocation()">Search by Location</button>
+      </div>
+    </div>
+
+    <!-- Result display -->
+    <div id="address_result" class="mt-4"></div>
+
+    <!-- Copy Address Button -->
+    <div id="copy_address_btn" class="text-center mt-4" style="display: none;">
+      <button class="btn btn-info" onclick="copyAddress()">Copy Both</button>
+    </div>
+  </div>
+
+  <!-- Load Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
+
+</html>
