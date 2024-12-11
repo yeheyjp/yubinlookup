@@ -34,7 +34,7 @@
 
     // Search for postal code
     function searchByPostalCode() {
-      const postalCode = document.getElementById('postal_code_input').value;
+      const postalCode = document.getElementById('postal_code_input').value.trim(); // Trim spaces
       console.log("Searching for postal code:", postalCode);
 
       if (!postalData || postalData.length === 0) {
@@ -43,7 +43,9 @@
       }
 
       // Find matching entry in the CSV data
-      const entry = postalData.find(row => row.postal_code === postalCode);
+      const entry = postalData.find(row => row.postal_code && row.postal_code.trim() === postalCode); // Trim spaces in CSV too
+
+      console.log("Entry found:", entry);
 
       if (entry) {
         document.getElementById("address_result").innerHTML = `
