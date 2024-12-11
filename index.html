@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postal Code Search</title>
+</head>
+<body>
+    <h1>Postal Code Search</h1>
+    <input type="text" id="postal_code" placeholder="Enter Postal Code">
+    <button onclick="searchByPostalCode()">Search by Postal Code</button>
+    <div id="address_result"></div>
+
+    <h2>Or Search by Location</h2>
+    <select id="prefecture"></select>
+    <select id="city"></select>
+    <select id="town"></select>
+    <button onclick="searchByLocation()">Search by Location</button>
+
+    <!-- 1. Load Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.24.0/dist/supabase.min.js"></script>
+
+    <script>
+        // 2. Initialize Supabase client
+        const supabase = Supabase.createClient(
+            'https://ttpceipkbcsbtdcuguyg.supabase.co', // Your Supabase URL
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0cGNlaXBrYmNzYnRkY3VndXlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM4OTcyMTAsImV4cCI6MjA0OTQ3MzIxMH0.WZNqIedwlODHdmyrrF6O7Nlm6RXWe2pI66K0QRl1tE4' // Your Supabase anon key
+        );
+
+        // 3. Function to search by Postal Code
+        async function searchByPostalCode() {
+            const postalCode = document.getElementById("postal_code").value;
+
+            if (!postalCode) {
+                alert("Please enter a postal code.");
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('yubinlookup')
+                    .select('english_address, japanese_address')
+                    .eq('postal_code', postalCode);
+
+                if (error) throw error;
+
+                if (data.length > 0) {
+                    document.getElementById("address_result").innerHTML = `
+                        <p>English Address: ${data[0].english_address}</p>
+                        <p>Japanese Address: ${data[0].japanese_address}</p>
+                    `;
+                } else {
+                    document.getElementById("address_result").innerHTML = "<p>No data found for this postal code.</p>";
+                }
+            } catch (err) {
+                document.getElementById("address_result").innerHTML = "<p>Error occurred during postal code search.</p>";
+                console.error("Error during postal code search:", err);
+            }
+        }
+
+        // 4. Function to load Prefectures into the select dropdown
+        async function loadPrefectures() {
+            try {
+                const { data, error } = await supabase
+                    .from('yubinlookup')
+                    .select('prefecture')
+                    .distinct();
+
+                if (error) throw error;
+
+                const prefectureSelect = document.getElementById('prefecture');
+                prefectureSelect.innerHTML = '<option value="">Select Prefecture</option>'; // Clear previous options
+
+                data.forEach((pref) => {
+                    const option = document.createElement('option');
+                    option.value = pref.prefecture;
+                    option.textContent = pref.prefecture;
+                    prefectureSelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Error loading prefectures:", err);
+            }
+        }
+
+        // 5. Function to load Cities based on selected Prefecture
+        async function loadCities() {
+            const prefecture = document.getElementById('prefecture').value;
+
+            if (!prefecture) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('yubinlookup')
+                    .select('city')
+                    .eq('prefecture', prefecture)
+                    .distinct();
+
+                if (error) throw error;
+
+                const citySelect = document.getElementById('city');
+                citySelect.innerHTML = '<option value="">Select City</option>';
+
+                data.forEach((city) => {
+                    const option = document.createElement('option');
+                    option.value = city.city;
+                    option.textContent = city.city;
+                    citySelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Error loading cities:", err);
+            }
+        }
+
+        // 6. Function to load Towns based on selected City
+        async function loadTowns() {
+            const city = document.getElementById('city').value;
+
+            if (!city) return;
+
+            try {
+                const { data, error } = await supabase
+                    .from('yubinlookup')
+                    .select('town')
+                    .eq('city', city)
+                    .distinct();
+
+                if (error) throw error;
+
+                const townSelect = document.getElementById('town');
+                townSelect.innerHTML = '<option value="">Select Town</option>';
+
+                data.forEach((town) => {
+                    const option = document.createElement('option');
+                    option.value = town.town;
+                    option.textContent = town.town;
+                    townSelect.appendChild(option);
+                });
+            } catch (err) {
+                console.error("Error loading towns:", err);
+            }
+        }
+
+        // Call loadPrefectures to populate the prefecture select when the page loads
+        window.onload = loadPrefectures;
+    </script>
+</body>
+</html>
