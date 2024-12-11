@@ -42,7 +42,7 @@
         return;
       }
 
-      // Find matching entry in the CSV data
+      // Find matching entry in the CSV data by postal_code
       const entry = postalData.find(row => row.postal_code && row.postal_code.trim() === postalCode); // Trim spaces in CSV too
 
       console.log("Entry found:", entry);
