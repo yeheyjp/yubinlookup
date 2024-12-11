@@ -14,6 +14,9 @@
 
     // Array to store parsed CSV data
     let postalData = [];
+    
+    // Object to store cities and towns by prefecture
+    let cityTownData = {};
 
     // Load CSV data into an array using PapaParse
     function loadCSVData() {
@@ -25,6 +28,9 @@
         complete: function(results) {
           postalData = results.data;
           console.log("CSV data loaded:", postalData);
+          
+          // Build city-town data structure
+          buildCityTownData();
         },
         error: function(error) {
           console.error("Error loading CSV data:", error);
@@ -32,21 +38,89 @@
       });
     }
 
-    // Search for postal code
-    function searchByPostalCode() {
-      const postalCode = document.getElementById('postal_code_input').value.trim(); // Trim spaces
-      console.log("Searching for postal code:", postalCode);
+    // Build city-town data from postalData
+    function buildCityTownData() {
+      postalData.forEach(row => {
+        if (row.prefecture) {
+          if (!cityTownData[row.prefecture]) {
+            cityTownData[row.prefecture] = {};
+          }
+          if (row.city) {
+            if (!cityTownData[row.prefecture][row.city]) {
+              cityTownData[row.prefecture][row.city] = [];
+            }
+            if (row.town && !cityTownData[row.prefecture][row.city].includes(row.town)) {
+              cityTownData[row.prefecture][row.city].push(row.town);
+            }
+          }
+        }
+      });
+      console.log("City-Town Data:", cityTownData);
+      loadPrefectures(); // Load prefectures dropdown after data is ready
+    }
 
-      if (!postalData || postalData.length === 0) {
-        alert("CSV data is not yet loaded.");
+    // Load prefectures into the dropdown
+    function loadPrefectures() {
+      const prefectureSelect = document.getElementById('prefecture_select');
+      prefectureSelect.innerHTML = '<option value="">Select Prefecture</option>'; // Clear existing options
+
+      Object.keys(cityTownData).forEach(prefecture => {
+        const option = document.createElement('option');
+        option.value = prefecture;
+        option.textContent = prefecture;
+        prefectureSelect.appendChild(option);
+      });
+    }
+
+    // Load cities into the city dropdown based on selected prefecture
+    function loadCities() {
+      const prefecture = document.getElementById('prefecture_select').value;
+      const citySelect = document.getElementById('city_select');
+      citySelect.innerHTML = '<option value="">Select City</option>'; // Clear existing options
+
+      if (prefecture && cityTownData[prefecture]) {
+        Object.keys(cityTownData[prefecture]).forEach(city => {
+          const option = document.createElement('option');
+          option.value = city;
+          option.textContent = city;
+          citySelect.appendChild(option);
+        });
+      }
+    }
+
+    // Load towns into the town dropdown based on selected city
+    function loadTowns() {
+      const prefecture = document.getElementById('prefecture_select').value;
+      const city = document.getElementById('city_select').value;
+      const townSelect = document.getElementById('town_select');
+      townSelect.innerHTML = '<option value="">Select Town</option>'; // Clear existing options
+
+      if (prefecture && city && cityTownData[prefecture] && cityTownData[prefecture][city]) {
+        cityTownData[prefecture][city].forEach(town => {
+          const option = document.createElement('option');
+          option.value = town;
+          option.textContent = town;
+          townSelect.appendChild(option);
+        });
+      }
+    }
+
+    // Search for address by selected prefecture, city, and town
+    function searchByLocation() {
+      const prefecture = document.getElementById('prefecture_select').value;
+      const city = document.getElementById('city_select').value;
+      const town = document.getElementById('town_select').value;
+
+      if (!prefecture || !city || !town) {
+        alert("Please select a prefecture, city, and town.");
         return;
       }
 
-      // Find matching entry in the CSV data by postal_code
+      console.log("Searching for:", prefecture, city, town);
+
+      // Find matching entry in the CSV data
       const entry = postalData.find(row => {
-        // Ensure postal_code is a string and trimmed
-        const rowPostalCode = row.postal_code ? String(row.postal_code).trim() : '';
-        return rowPostalCode === postalCode;
+        return row.prefecture === prefecture && row.city === city && row.town === town;
       });
 
       console.log("Entry found:", entry);
@@ -55,12 +129,9 @@
         document.getElementById("address_result").innerHTML = `
           <p>English Address: ${entry.english_address}</p>
           <p>Japanese Address: ${entry.japanese_address}</p>
-          <p>Prefecture: ${entry.prefecture}</p>
-          <p>City: ${entry.city}</p>
-          <p>Town: ${entry.town}</p>
         `;
       } else {
-        document.getElementById("address_result").innerHTML = "<p>No data found for this postal code.</p>";
+        document.getElementById("address_result").innerHTML = "<p>No data found for this location.</p>";
       }
     }
 
@@ -74,6 +145,23 @@
   <div>
     <input type="text" id="postal_code_input" placeholder="Enter postal code">
     <button onclick="searchByPostalCode()">Search</button>
+  </div>
+
+  <!-- Manual search form -->
+  <div>
+    <select id="prefecture_select" onchange="loadCities()">
+      <option value="">Select Prefecture</option>
+    </select>
+
+    <select id="city_select" onchange="loadTowns()">
+      <option value="">Select City</option>
+    </select>
+
+    <select id="town_select">
+      <option value="">Select Town</option>
+    </select>
+
+    <button onclick="searchByLocation()">Search by Location</button>
   </div>
 
   <div id="address_result"></div>
