@@ -18,12 +18,15 @@
     let cityTownData = {};
 
     function loadCSVData() {
+      console.log("Loading CSV data from: ", csvUrl);
       Papa.parse(csvUrl, {
         download: true,
         header: true,
         dynamicTyping: true,
+        skipEmptyLines: true,
         complete: function(results) {
           postalData = results.data;
+          console.log("CSV Data Loaded:", postalData);
           buildCityTownData();
         },
         error: function(error) {
@@ -150,7 +153,7 @@
 </head>
 <body>
   <div class="container mt-1">
-    <h2 class="text-center mb-4">Postal Code Lookup 4:22PM</h2>
+    <h2 class="text-center mb-4">Postal Code Lookup 4:26 PM</h2>
     <div class="mb-4">
       <div class="input-group">
         <input type="text" id="postal_code_input" class="form-control" placeholder="Enter postal code">
