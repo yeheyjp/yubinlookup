@@ -5,22 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Postal Code Lookup</title>
 
-  <!-- Include Supabase Client Library -->
+  <!-- Load Supabase client library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.0.0/dist/umd/supabase.min.js"></script>
 
-  <!-- Your custom JavaScript -->
   <script>
-    // Initialize Supabase
+    // Step 1: Initialize the Supabase client (before any code that uses supabase)
     const supabaseUrl = 'https://ttpceipkbcsbtdcuguyg.supabase.co';  // Replace with your project URL
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR0cGNlaXBrYmNzYnRkY3VndXlnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzM4OTcyMTAsImV4cCI6MjA0OTQ3MzIxMH0.WZNqIedwlODHdmyrrF6O7Nlm6RXWe2pI66K0QRl1tE4';  // Replace with your anon public key
     const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  </script>
+  
+</head>
+<body>
 
-    // Function to search by postal code
+  <!-- Postal code input form -->
+  <div>
+    <input type="text" id="postal_code_input" placeholder="Enter postal code">
+    <button onclick="searchByPostalCode()">Search</button>
+  </div>
+
+  <div id="address_result"></div>
+
+  <script>
+    // Step 2: Define the function to search by postal code
     function searchByPostalCode() {
       const postalCode = document.getElementById('postal_code_input').value;
 
+      // Step 3: Make the Supabase query to search by postal code
       supabase
-        .from('yubinlookup')  // Replace with your actual table name
+        .from('yubinlookup')  // Ensure your table name is correct
         .select('english_address, japanese_address')
         .eq('postal_code', postalCode)
         .then((response) => {
@@ -40,12 +53,6 @@
         });
     }
   </script>
-</head>
-<body>
-  <div>
-    <input type="text" id="postal_code_input" placeholder="Enter postal code">
-    <button onclick="searchByPostalCode()">Search</button>
-  </div>
-  <div id="address_result"></div>
+
 </body>
 </html>
