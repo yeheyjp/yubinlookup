@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Postal Code Lookup 3:10 PM</title>
+  <title>Postal Code Lookup 3:14 PM</title>
 
   <!-- Load Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -129,30 +129,34 @@
       console.log("Entry found:", entry);
 
       if (entry) {
+        const englishAddress = `${entry.postal_code} ${entry.prefecture} ${entry.city} ${entry.town}`;
+        const japaneseAddress = `${entry.postal_code} ${entry.prefecture_kanji} ${entry.city_kanji} ${entry.town_kanji}`;
+        
         document.getElementById("address_result").innerHTML = `
-          <p><strong>English Address:</strong> ${entry.english_address}</p>
-          <p><strong>Japanese Address:</strong> ${entry.japanese_address}</p>
+          <p><strong>English Address:</strong> ${englishAddress}</p>
+          <p><strong>Japanese Address:</strong> ${japaneseAddress}</p>
+          <button class="btn btn-info" onclick="copyBoth()">Copy Both</button>
         `;
       } else {
         document.getElementById("address_result").innerHTML = "<p>No data found for this location.</p>";
       }
     }
 
-    // Search by postal code (if required)
-    function searchByPostalCode() {
-      const postalCode = document.getElementById('postal_code_input').value;
-      console.log("Searching for postal code:", postalCode);
+    // Copy both the English and Japanese address
+    function copyBoth() {
+      const englishAddress = document.querySelector("#address_result p:nth-child(1)").textContent.split(":")[1].trim();
+      const japaneseAddress = document.querySelector("#address_result p:nth-child(2)").textContent.split(":")[1].trim();
+      const textToCopy = `${englishAddress}\n${japaneseAddress}`;
+      
+      // Create a temporary textarea to copy the text
+      const tempTextArea = document.createElement('textarea');
+      tempTextArea.value = textToCopy;
+      document.body.appendChild(tempTextArea);
+      tempTextArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempTextArea);
 
-      // Find matching entry in the CSV data
-      const entry = postalData.find(row => row.postal_code == postalCode);
-      if (entry) {
-        document.getElementById("address_result").innerHTML = `
-          <p><strong>English Address:</strong> ${entry.english_address}</p>
-          <p><strong>Japanese Address:</strong> ${entry.japanese_address}</p>
-        `;
-      } else {
-        document.getElementById("address_result").innerHTML = "<p>No data found for this postal code.</p>";
-      }
+      alert('Addresses copied to clipboard!');
     }
 
     // Call loadCSVData when the page loads
@@ -166,14 +170,6 @@
 
     <div class="row">
       <div class="col-12 col-md-6 mx-auto">
-        <!-- Postal code input form -->
-        <div class="mb-4">
-          <div class="input-group">
-            <input type="text" class="form-control" id="postal_code_input" placeholder="Enter postal code" />
-            <button class="btn btn-primary" onclick="searchByPostalCode()">Search by Postal Code</button>
-          </div>
-        </div>
-
         <!-- Manual search form -->
         <div class="mb-4">
           <label for="prefecture_select" class="form-label">Select Prefecture</label>
@@ -196,12 +192,12 @@
           </select>
         </div>
 
-        <button class="btn btn-success w-100" onclick="searchByLocation()">Search by Location</button>
+        <button class="btn btn-success w-100" onclick="searchByLocation()">Search</button>
       </div>
     </div>
 
     <!-- Results -->
-    <div id="address_result" class="mt-4"></div>
+    <div id="address_result" class="mt-4 text-center"></div>
   </div>
 
   <!-- Load Bootstrap JS (optional for additional functionality like modals) -->
