@@ -17,6 +17,7 @@
 
     // Load CSV data into an array using PapaParse
     function loadCSVData() {
+      console.log("Loading CSV data...");
       Papa.parse(csvUrl, {
         download: true,
         header: true, // Consider first row as headers
@@ -36,12 +37,21 @@
       const postalCode = document.getElementById('postal_code_input').value;
       console.log("Searching for postal code:", postalCode);
 
+      if (!postalData || postalData.length === 0) {
+        alert("CSV data is not yet loaded.");
+        return;
+      }
+
       // Find matching entry in the CSV data
       const entry = postalData.find(row => row.postal_code === postalCode);
+
       if (entry) {
         document.getElementById("address_result").innerHTML = `
           <p>English Address: ${entry.english_address}</p>
           <p>Japanese Address: ${entry.japanese_address}</p>
+          <p>Prefecture: ${entry.prefecture}</p>
+          <p>City: ${entry.city}</p>
+          <p>Town: ${entry.town}</p>
         `;
       } else {
         document.getElementById("address_result").innerHTML = "<p>No data found for this postal code.</p>";
