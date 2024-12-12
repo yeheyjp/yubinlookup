@@ -123,11 +123,28 @@
           resultGroup.classList.add('result-group', 'mb-4');
 
           resultGroup.innerHTML = `
-            <p><strong>English Address:</strong> ${entry.english_address}</p>
-            <p><strong>Japanese Address:</strong> ${entry.japanese_address}</p>
-            <p><strong>Shipping Fee:</strong> ${entry.shipping_fee || 'N/A'}</p>
-            <p><strong>Lead Time:</strong> ${entry.lead_time || 'N/A'}</p>
-            <button class="btn btn-info" onclick="copyBoth(this)">Copy Both</button>
+            <table class="table table-bordered">
+  <tbody>
+    <tr>
+      <td>English</td>
+      <td>${entry.english_address}</td>
+    </tr>
+    <tr>
+      <td>Japanese</td>
+      <td>${entry.japanese_address}</td>
+    </tr>
+    <tr>
+      <td>Shipping Fee</td>
+      <td>¥${entry.shipping_fee || 'No Data Yet'}</td>
+    </tr>
+    <tr>
+      <td>Lead Time</td>
+      <td>${entry.lead_time || 'No Data Yet'}</td>
+    </tr>
+  </tbody>
+</table>
+
+<button class="btn btn-success" onclick="copyBoth(this)">Copy Address</button>
           `;
 
           resultsContainer.appendChild(resultGroup);
@@ -164,11 +181,28 @@
           const resultGroup = document.createElement('div');
           resultGroup.classList.add('result-group', 'mb-4');
           resultGroup.innerHTML = `
-            <p><strong>English Address:</strong> ${entry.english_address}</p>
-            <p><strong>Japanese Address:</strong> ${entry.japanese_address}</p>
-            <p><strong>Shipping Fee:</strong> ${entry.shipping_fee || 'N/A'}</p>
-            <p><strong>Lead Time:</strong> ${entry.lead_time || 'N/A'}</p>
-            <button class="btn btn-info" onclick="copyBoth(this)">Copy Both</button>
+            <table class="table table-bordered">
+  <tbody>
+    <tr>
+      <td>English</td>
+      <td>${entry.english_address}</td>
+    </tr>
+    <tr>
+      <td>Japanese</td>
+      <td>${entry.japanese_address}</td>
+    </tr>
+    <tr>
+      <td>Shipping Fee</td>
+      <td>${entry.shipping_fee || 'No Data Yet'}</td>
+    </tr>
+    <tr>
+      <td>Lead Time</td>
+      <td>¥${entry.shipping_fee || 'No Data Yet'}</td>
+    </tr>
+  </tbody>
+</table>
+
+<button class="btn btn-success" onclick="copyBoth(this)">Copy Address</button>
           `;
           resultsContainer.appendChild(resultGroup);
         });
@@ -177,21 +211,39 @@
       }
     }
 
-    function copyBoth(button) {
-      const resultGroup = button.closest('.result-group');
-      const englishAddress = resultGroup.querySelector("p:nth-child(1)").textContent.split(':')[1].trim();
-      const japaneseAddress = resultGroup.querySelector("p:nth-child(2)").textContent.split(':')[1].trim();
-      const textToCopy = `${englishAddress}\n${japaneseAddress}`;
-      
-      const tempTextArea = document.createElement('textarea');
-      tempTextArea.value = textToCopy;
-      document.body.appendChild(tempTextArea);
-      tempTextArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(tempTextArea);
+function copyBoth(button) {
+    const resultGroup = button.closest('.result-group');
+    const table = resultGroup.querySelector('table');
 
-      alert('Addresses copied to clipboard!');
-    }
+    const englishAddress = table.rows[0].cells[1].textContent; 
+    const japaneseAddress = table.rows[1].cells[1].textContent; 
+    const textToCopy = `${englishAddress}\n${japaneseAddress}`;
+
+    const tempTextArea = document.createElement('textarea');
+    tempTextArea.value = textToCopy;
+    document.body.appendChild(tempTextArea);
+    tempTextArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempTextArea);
+
+    // Show "Copied." message beside the button
+    let copiedMessage = document.createElement('span');
+    copiedMessage.textContent = 'Copied.';
+    copiedMessage.style.marginLeft = '10px';
+    copiedMessage.style.color = 'green';
+    copiedMessage.style.fontWeight = 'bold';
+    copiedMessage.style.transition = 'opacity 0.5s ease';
+    button.parentElement.appendChild(copiedMessage);
+
+    // Fade out and remove the message after 3 seconds
+    setTimeout(() => {
+      copiedMessage.style.opacity = '0';
+    }, 2000); // Wait 2 seconds, then fade out
+
+    setTimeout(() => {
+      copiedMessage.remove();
+    }, 3000); // Remove from DOM after 3 seconds
+  }
 
     window.onload = loadCSVData;
   </script>
@@ -200,47 +252,57 @@
 <body>
   <div class="container mt-1">
     <!-- Postal code input group with search button on the right -->
-    <div class="mt-4 mb-4">
+	<h3 class="mt-4">Address Search</h3>
+    <div class="mt-1 mb-4">
       <div class="input-group">
         <input type="text" id="postal_code_input" class="form-control" placeholder="Enter postal code">
         <button class="btn btn-primary" onclick="searchByPostalCode()">Search by Postal Code</button>
       </div>
     </div>
 
-    <!-- Prefecture and City selectors in one row -->
-    <div class="mb-1">
-        <select id="prefecture_select" class="form-select" onchange="loadCities()">
-          <option value="">Select Prefecture</option>
-        </select>
-	</div>
-	<div class="mb-1">
-        <select id="city_select" class="form-select" onchange="loadTowns()">
-          <option value="">Select City</option>
-        </select>
-    </div>
+<!-- Prefecture and City selectors in one row -->
+<div class="mb-1">
+  <select id="prefecture_select" class="form-select" onchange="loadCities()">
+    <option value="">Select Prefecture</option>
+  </select>
+</div>
+<div class="mb-1">
+  <select id="city_select" class="form-select" onchange="loadTowns()">
+    <option value="">Select City</option>
+  </select>
+</div>
 
-    <!-- Town and Search by Location in another row -->
-    <div class="mb-1">
-        <select id="town_select" class="form-select">
-          <option value="">Select Town</option>
-        </select>
-    </div>
-    <div class="mb-4">
-        <button class="btn btn-success w-100" onclick="searchByLocation()">Search by Location</button>
-      </div>
-    </div>
+<!-- Town and Search by Location in another row -->
+<div class="mb-1">
+  <select id="town_select" class="form-select">
+    <option value="">Select Town</option>
+  </select>
+</div>
+<div class="mb-4">
+  <button class="btn btn-primary w-60" onclick="searchByLocation()">Search by Location</button>
+</div>
+
 
     <!-- Result display -->
-    <div id="address_result" class="mt-4 text-center"></div>
+	<h3>Address Result</h3>
+    <div id="address_result" class="mt-1"></div>
 
     <!-- Copy Address Button -->
     <div id="copy_address_btn" class="text-center mt-4" style="display: none;">
-      <button class="btn btn-info" onclick="copyAddress()">Copy Both</button>
+      <button class="btn btn-success" onclick="copyAddress()">Copy Address</button>
     </div>
   </div>
 
   <!-- Load Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+  	document.getElementById('postal_code_input').addEventListener('keypress', function(event) {
+  if (event.key === 'Enter') {
+    searchByPostalCode();
+  }
+});
+</script>
 </body>
+
 
 </html>
