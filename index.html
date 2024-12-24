@@ -125,6 +125,10 @@
           resultGroup.innerHTML = `
             <table class="table table-bordered" style="background-color: white;">
   <tbody>
+	<tr>
+	  <td>Postal Code</td>
+	  <td>${entry.postal}</td>
+	</tr>
     <tr>
       <td>English</td>
       <td>${entry.english_address}</td>
@@ -183,6 +187,10 @@
           resultGroup.innerHTML = `
             <table class="table table-bordered" style="background-color: white;">
   <tbody>
+	<tr>
+	  <td>Postal Code</td>
+	  <td>${entry.postal}</td>
+	</tr>
     <tr>
       <td>English</td>
       <td>${entry.english_address}</td>
@@ -215,9 +223,10 @@ function copyBoth(button) {
     const resultGroup = button.closest('.result-group');
     const table = resultGroup.querySelector('table');
 
-    const englishAddress = table.rows[0].cells[1].textContent; 
-    const japaneseAddress = table.rows[1].cells[1].textContent; 
-    const textToCopy = `${englishAddress}\n${japaneseAddress}`;
+	const postal = table.rows[0].cells[1].textContent;
+    const englishAddress = table.rows[1].cells[1].textContent; 
+    const japaneseAddress = table.rows[2].cells[1].textContent; 
+    const textToCopy = `${postal}\n${englishAddress}\n${japaneseAddress}`;
 
     const tempTextArea = document.createElement('textarea');
     tempTextArea.value = textToCopy;
